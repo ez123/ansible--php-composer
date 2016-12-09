@@ -1,0 +1,60 @@
+---
+# ----------------------------------------------------------------------
+- name: "new_install: fetch composer installer"
+  get_url:
+    url: "{{ ez123_composer__source_url }}"
+    dest: "/tmp/composer_installer"
+    force: yes
+  #register: _X_composer_download
+
+# ----------------------------------------------------------------------
+- name: "create composer dir parent dir if needed"
+  file:
+    path: "{{ ez123_composer__phar_dir }}"
+    state: directory
+
+# ----------------------------------------------------------------------
+- name: "install composer"
+  command: php -d allow_url_fopen=On /tmp/composer_installer
+  args:
+      chdir:   "{{ ez123_composer__phar_dir }}"
+  #     creates: "{{ ez123_composer__phar_dir }}/composer-install.ok"
+  register: _X_composer_install
+
+# ----------------------------------------------------------------------
+- name: "check composer.phar is installed"
+  stat:
+    path: "{{ ez123_composer__phar_dir }}/composer.phar"
+  register: _X_composer_phar_1
+
+- name: "only proceed if we are ok"
+  assert:
+    that:
+      - "{{ _X_composer_phar_1.stat.exists is defined and _X_composer_phar_1.stat.exists }}"
+
+# ----------------------------------------------------------------------
+- name: "check if composer is running before creating the symlink"
+  command: "{{ ez123_composer__phar_dir }}/composer.phar --version"
+  changed_when: false
+  register: _X_composer_ver
+  failed_when: "{{
+      not (
+        (_X_composer_ver.rc == 0) and
+        (_X_composer_ver.stdout |search( ez123_composer__test_regexp ))
+      )
+    }}"
+
+# ----------------------------------------------------------------------
+- name: "Create symlink in bin dir"
+  file:
+    src:  "{{ ez123_composer__phar_dir }}/composer.phar"
+    dest: "{{ ez123_composer__bin_dir }}/composer"
+    state: link
+    mode: "a+x"
+
+# ----------------------------------------------------------------------
+# - name: "add lock to prevent repeated installs"
+#   file:
+#     path:  "{{ ez123_composer__phar_dir }}/composer-install.ok"
+#     state: touch
+

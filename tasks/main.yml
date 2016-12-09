@@ -1,0 +1,38 @@
+---
+
+# ----------------------------------------------------------------------
+- name: "check if composer is already installed (1)"
+  command: "./composer --version"
+  args:
+    chdir: "{{ ez123_composer__bin_dir }}"
+  register: _X_composer_ver_0
+  changed_when: false
+  failed_when: false
+
+- set_fact:
+    _T_compose_runs_ok: "{{
+      (_X_composer_ver_0.rc == 0) and
+      (_X_composer_ver_0.stdout |search( ez123_composer__test_regexp ))
+      }}"
+
+# ----------------------------------------------------------------------
+- include: ./install.yml
+  when: "{{ not _T_compose_runs_ok }}"
+
+# ----------------------------------------------------------------------
+- include: ./update.yml
+  when: "{{ _T_compose_runs_ok and ez123_composer__update_if_installed }}"
+
+# ----------------------------------------------------------------------
+- name: "check if composer is running (2)"
+  command: "./composer --version"
+  args:
+    chdir: "{{ ez123_composer__bin_dir }}"
+  register: _X_composer_ver_1
+  changed_when: false
+  failed_when: "{{
+      not (
+        (_X_composer_ver_1.rc == 0) and
+        (_X_composer_ver_1.stdout |search( ez123_composer__test_regexp ))
+      )
+    }}"

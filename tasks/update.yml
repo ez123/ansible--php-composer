@@ -1,0 +1,14 @@
+---
+
+- name: "update composer"
+  command: "./composer self-update --clean-backups --stable --no-interaction"
+  args:
+    chdir: "{{ ez123_composer__bin_dir }}"
+  register: _X_composer_update
+  changed_when: "{{
+        not (
+            (_X_composer_update.rc == 0) and
+            (_X_composer_update.stdout == '') and
+            (_X_composer_update.stderr |search('^You are already using composer version'))
+        )
+    }}"

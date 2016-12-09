@@ -1,0 +1,8 @@
+---
+ez123_composer__phar_dir: "/usr/local/php-composer"
+ez123_composer__bin_dir:  "/usr/local/bin"
+
+ez123_composer__source_url: "https://getcomposer.org/installer"
+
+ez123_composer__update_if_installed: true
+ez123_composer__test_regexp: "^[Cc]omposer version [0-9]\\.[0-9]\\.[0-9]"
