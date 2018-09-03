@@ -17,11 +17,11 @@
 
 # ----------------------------------------------------------------------
 - include: ./install.yml
-  when: "{{ not _T_compose_runs_ok }}"
+  when: not _T_compose_runs_ok
 
 # ----------------------------------------------------------------------
 - include: ./update.yml
-  when: "{{ _T_compose_runs_ok and ez123_composer__update_if_installed }}"
+  when: (_T_compose_runs_ok and ez123_composer__update_if_installed)
 
 # ----------------------------------------------------------------------
 - name: "check if composer is running (2)"
@@ -30,9 +30,8 @@
     chdir: "{{ ez123_composer__bin_dir }}"
   register: _X_composer_ver_1
   changed_when: false
-  failed_when: "{{
+  failed_when:
       not (
         (_X_composer_ver_1.rc == 0) and
         (_X_composer_ver_1.stdout |search( ez123_composer__test_regexp ))
       )
-    }}"

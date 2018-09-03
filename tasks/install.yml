@@ -37,12 +37,11 @@
   command: "{{ ez123_composer__phar_dir }}/composer.phar --version"
   changed_when: false
   register: _X_composer_ver
-  failed_when: "{{
+  failed_when:
       not (
         (_X_composer_ver.rc == 0) and
         (_X_composer_ver.stdout |search( ez123_composer__test_regexp ))
       )
-    }}"
 
 # ----------------------------------------------------------------------
 - name: "Create symlink in bin dir"
